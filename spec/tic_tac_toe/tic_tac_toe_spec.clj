@@ -7,14 +7,14 @@
 (describe "A tic tac toe game"
   (it "creates an empty game board"
     (should= empty-board (new-board)))
-  (it "plays an x on the grid"
+  (it "plays an x on the board"
     (should= [[:x "" ""] ["" "" ""] ["" "" ""]] (play-x {:row 0 :column 0} empty-board))
     (should= [["" :x ""] ["" "" ""] ["" "" ""]] (play-x {:row 0 :column 1} empty-board))
     (should= [["" "" :x] ["" "" ""] ["" "" ""]] (play-x {:row 0 :column 2} empty-board))
     (should= [["" "" ""] [:x "" ""] ["" "" ""]] (play-x {:row 1 :column 0} empty-board))
     (should= [["" "" ""] ["" "" ""] [:x "" ""]] (play-x {:row 2 :column 0} empty-board))
     )
-  (it "plays an o on the grid"
+  (it "plays an o on the board"
     (should= [["" "" ""] ["" "" ""] ["" :o ""]] (play-o {:row 2 :column 1} empty-board)))
   (it "counts values in a collection"
     (should= 0 (count-values empty-board :x))
