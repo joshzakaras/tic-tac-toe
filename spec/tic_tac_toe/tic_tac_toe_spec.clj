@@ -88,7 +88,27 @@
                         ["" "" ""]] :versus-computer)
         (should-have-invoked :play-computer-turn {:with [[["" "" ""]
                                                      ["" :x ""]
-                                                     ["" "" ""]]]}))))
+                                                     ["" "" ""]]]})))
+
+    (it "game-loop where x wins"
+      (with-redefs [terminal/print-board (stub :terminal/print-board)
+                    board/get-win (stub :board/get-win {:return :x})
+                    terminal/print-win (stub :terminal/print-win)]
+        (sut/game-loop :some-board :some-game-type)
+        (should-have-invoked :terminal/print-board)
+        (should-have-invoked :terminal/print-win)))
+
+    (it "game-loop where with full board, nobody wins"
+      (with-redefs [terminal/print-board (stub :terminal/print-board)
+                    board/get-win (stub :board/get-win {:return nil})
+                    board/full-board? (stub :board/full-board? {:return true})
+                    terminal/print-win (stub :terminal/print-win)
+                    terminal/print-tie (stub :terminal/print-tie)]
+        (sut/game-loop :some-board :some-game-type)
+        (should-have-invoked :terminal/print-board)
+        (should-not-have-invoked :terminal/print-win)
+        (should-have-invoked :terminal/print-tie)))
+    )
 
   (context "A player turn"
     (it "asks for the players move"

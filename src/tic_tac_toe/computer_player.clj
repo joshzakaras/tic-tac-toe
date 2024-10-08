@@ -55,10 +55,21 @@
        (filter #(board/valid-turn? % board))
        first))
 
+(defn opponent-fork? [board]
+  (let [opponent-tile (board/get-next-turn board)]
+    (or
+      (every? #(= opponent-tile %) [(board/get-square {:row 0 :column 0} board) (board/get-square {:row 2 :column 2} board)])
+      (every? #(= opponent-tile %) [(board/get-square {:row 0 :column 2} board) (board/get-square {:row 2 :column 0} board)]))))
+
+(defn generate-anti-fork-move [board]
+  (when (opponent-fork? board)
+    (generate-empty-side-move board)))
+
 (defn generate-move [board]
   (cond
     (generate-winning-move board) (generate-winning-move board)
     (generate-blocking-move board) (generate-blocking-move board)
+    (generate-anti-fork-move board) (generate-anti-fork-move board)
     (center-move-valid? board) {:row 1 :column 1}
     (generate-opposing-corner-move board) (generate-opposing-corner-move board)
     (generate-empty-corner-move board) (generate-empty-corner-move board)
