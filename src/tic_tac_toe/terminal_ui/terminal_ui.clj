@@ -8,6 +8,12 @@
 (defn ask-for-game-type []
   (println "Would you like to play against a computer? (y/n)"))
 
+(defn ask-for-difficulty []
+  (println "What difficulty would you like to set the computer at? (easy/medium/hard)"))
+
+(defn ask-for-player-token []
+  (println "Would you like to play as X, or O? (x/o)"))
+
 (defn print-new-game-alert []
   (println "Starting a new game of tic tac toe..."))
 
@@ -76,13 +82,33 @@
       (not (board/valid-turn? (input-to-coords input) board)) (handle-invalid-turn board)
       :else (input-to-coords input))))
 
+(defn get-formatted-user-input []
+  (str/lower-case (read-line)))
+
 (defn get-game-type []
   (ask-for-game-type)
-  (let [input (str/lower-case (read-line))]
+  (let [input (get-formatted-user-input)]
     (cond
       (= "y" input) :versus-computer
       (= "n" input) :versus-player
       :else (get-game-type))))
+
+(defn get-difficulty []
+  (ask-for-difficulty)
+  (let [input (get-formatted-user-input)]
+    (cond
+      (= "easy" input) :easy
+      (= "med" input) :med
+      (= "hard" input) :hard
+      :else (get-difficulty))))
+
+(defn get-player-token []
+  (ask-for-player-token)
+  (let [input (get-formatted-user-input)]
+    (cond
+      (= "o" input) :o
+      (= "x" input) :x
+      :else (get-player-token))))
 
 (defn print-tie []
   (println "The game results in a tie..."))

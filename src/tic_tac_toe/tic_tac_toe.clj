@@ -9,22 +9,27 @@
         current-turn (board/get-current-turn board)]
     (board/set-square player-move current-turn board)))
 
-(defn current-turn [board game-type]
-  (if (or (= :versus-player game-type) (= :x (board/get-current-turn board)))
+(defn current-turn [board game-type difficulty player-token]
+  (if (or (= :versus-player game-type) (= player-token (board/get-current-turn board)))
     (player-turn board)
-    (cpu/play-computer-turn board)))
+    (cpu/play-computer-turn board difficulty)))
 
-(defn game-loop [board game-type]
+(defn game-loop [board game-type difficulty player-token]
   (terminal/print-board board)
   (cond
     (board/get-win board) (terminal/print-win board)
     (board/full-board? board) (terminal/print-tie)
-    :else (recur (current-turn board game-type) game-type)))
+    :else (recur (current-turn board game-type difficulty player-token) game-type difficulty player-token)))
 
 (defn tic-tac-toe []
   (terminal/print-new-game-alert)
   (terminal/print-input-format)
-  (game-loop (board/new-board) (terminal/get-game-type)))
+  (let [game-type (terminal/get-game-type)
+        difficulty (when (= :versus-computer game-type)
+                     (terminal/get-difficulty))
+        player-token (when (= :versus-computer game-type)
+                       (terminal/get-player-token))]
+    (game-loop (board/new-board) game-type difficulty player-token)))
 
 (defn -main []
   (tic-tac-toe))

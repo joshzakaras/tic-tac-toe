@@ -31,6 +31,12 @@
   (it "asks the user if it would like to play against another player or a computer"
     (should= "Would you like to play against a computer? (y/n)\n" (with-out-str (sut/ask-for-game-type))))
 
+  (it "asks the user what computer difficulty it would like to play against"
+    (should= "What difficulty would you like to set the computer at? (easy/medium/hard)\n" (with-out-str (sut/ask-for-difficulty))))
+
+  (it "asks the user if it would like to play as X or O"
+    (should= "Would you like to play as X, or O? (x/o)\n" (with-out-str (sut/ask-for-player-token))))
+
   (context "User Input"
 
     (it "takes the users input and converts it into coordinates"
@@ -53,10 +59,19 @@
         (with-in-str "00\n01" (sut/get-player-move [[:x "" ""] ["" "" ""] ["" "" ""]]))
         (should-have-invoked :handle-invalid-turn)))
 
-    (it "takes the answer to the users question and returns a game type"
+    (it "asks the game type question and returns a game type based on the users response"
       (with-redefs [sut/ask-for-game-type (stub :ask-for-game-type)]
         (should= :versus-computer (with-in-str "y" (sut/get-game-type)))
-        (should= :versus-player (with-in-str "n" (sut/get-game-type))))
+        (should= :versus-player (with-in-str "n" (sut/get-game-type)))))
 
-    )))
+    (it "asks the difficulty question and returns a difficulty based on the users response"
+      (with-redefs [sut/ask-for-difficulty (stub :ask-for-difficulty)]
+        (should= :easy (with-in-str "easy" (sut/get-difficulty)))
+        (should= :med (with-in-str "med" (sut/get-difficulty)))
+        (should= :hard (with-in-str "hard" (sut/get-difficulty)))))
+
+    (it "asks the token question and returns a token based on the users response"
+      (with-redefs [sut/ask-for-player-token (stub :ask-for-player-token)]
+        (should= :x (with-in-str "x" (sut/get-player-token)))
+        (should= :o (with-in-str "o" (sut/get-player-token)))))))
 

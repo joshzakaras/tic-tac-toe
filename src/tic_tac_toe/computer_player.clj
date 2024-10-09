@@ -65,7 +65,7 @@
   (when (opponent-fork? board)
     (generate-empty-side-move board)))
 
-(defn generate-move [board]
+(defn generate-calculated-move [board]
   (cond
     (generate-winning-move board) (generate-winning-move board)
     (generate-blocking-move board) (generate-blocking-move board)
@@ -75,5 +75,19 @@
     (generate-empty-corner-move board) (generate-empty-corner-move board)
     :else (generate-empty-side-move board)))
 
-(defn play-computer-turn [board]
-  (board/set-square (generate-move board) (board/get-current-turn board) board))
+(defn generate-random-move [board]
+  (let [random-coords {:row (rand-int 3) :column (rand-int 3)}]
+    (if (board/valid-turn? random-coords board)
+      random-coords
+      (generate-random-move board))))
+
+(defn random-generation-type []
+  (if (= 0 (rand-int 9))
+    generate-random-move
+    generate-calculated-move))
+
+(defn play-computer-turn [board difficulty]
+  (board/set-square (cond
+                      (= :hard difficulty) (generate-calculated-move board)
+                      (= :med difficulty) ((random-generation-type) board)
+                      :else (generate-random-move board)) (board/get-current-turn board) board))
