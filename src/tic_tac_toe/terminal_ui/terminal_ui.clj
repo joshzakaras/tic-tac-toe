@@ -9,7 +9,7 @@
   (println "Would you like to play against a computer? (y/n)"))
 
 (defn ask-for-difficulty []
-  (println "What difficulty would you like to set the computer at? (easy/medium/hard)"))
+  (println "What difficulty would you like to set the computer at? (easy/med/hard)"))
 
 (defn ask-for-player-token []
   (println "Would you like to play as X, or O? (x/o)"))

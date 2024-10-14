@@ -76,7 +76,7 @@
                   terminal/get-player-token (stub :get-player-token {:return :some-token})
                   println (stub :print-ln)]
       (sut/tic-tac-toe)
-      (should-have-invoked :game-loop {:with [(board/new-board) :versus-computer :some-difficulty :some-token]})))
+      (should-have-invoked :game-loop {:with [(board/new-board) {:game-type :versus-computer :difficulty :some-difficulty :player-token :some-token}]})))
 
   (it "starts the core game loop for the player mode"
     (with-redefs [sut/game-loop (stub :game-loop)
@@ -85,7 +85,7 @@
                   terminal/get-player-token (stub :get-player-token {:return :some-token})
                   println (stub :print-ln)]
       (sut/tic-tac-toe)
-      (should-have-invoked :game-loop {:with [(board/new-board) :versus-player nil nil]})))
+      (should-have-invoked :game-loop {:with [(board/new-board) {:game-type :versus-player :difficulty nil :player-token nil}]})))
 
   (context "Core Game Loop"
 
@@ -95,7 +95,7 @@
                                                           [:x :o :o]
                                                           [:o :x :x]]})
                     println (stub :println)]
-        (sut/game-loop (board/new-board) :some-game-type :some-difficulty :some-player-token)
+        (sut/game-loop (board/new-board) {:game-type :versus-computer :difficulty :some-difficulty :player-token :some-token})
         (should-have-invoked :print-board {:with [(board/new-board)]})))
 
     (it "ends the game if there is a tie"
@@ -106,7 +106,7 @@
                     println (stub :println)]
         (sut/game-loop [[:x :o :x]
                         [:x :o :o]
-                        [:o :x :x]] :some-game-type :some-difficulty :some-player-token)
+                        [:o :x :x]] {:game-type :versus-computer :difficulty :some-difficulty :player-token :some-token})
         (should-have-invoked :print-tie)))
 
     (it "ends the game if there is a win"
@@ -117,18 +117,27 @@
                     println (stub :println)]
         (sut/game-loop [[:x :x :x]
                         [:x :x :x]
-                        [:x :x :x]] :some-game-type :some-difficulty :some-player-token)
+                        [:x :x :x]] {:game-type :versus-computer :difficulty :some-difficulty :player-token :some-token})
         (should-have-invoked :print-win {:with [[[:x :x :x]
                                                  [:x :x :x]
                                                  [:x :x :x]]]})))
 
-    (it "has the player complete their turn"
-      (with-redefs [sut/player-turn (stub :turn {:return [[:x :o :x]
+    (it "plays the turn if no stoppage reason is found"
+      (with-redefs [terminal/print-win (stub :print-win)
+                    sut/play-turn (stub :play-turn {:return [[:x :o :x]
                                                           [:x :o :o]
                                                           [:o :x :x]]})
                     println (stub :println)]
-        (sut/game-loop (board/new-board) :some-game-type :some-difficulty :x)
-        (should-have-invoked :turn)))
+        (sut/game-loop (board/new-board) {:game-type :versus-computer :difficulty :some-difficulty :player-token :some-token})
+        (should-have-invoked :play-turn)))
+
+(it "has the player complete their turn"
+      (with-redefs [sut/player-turn (stub :player-turn {:return [[:x :o :x]
+                                                          [:x :o :o]
+                                                          [:o :x :x]]})
+                    println (stub :println)]
+        (sut/play-turn (board/new-board) {:game-type :versus-computer :difficulty :some-difficulty :player-token :x})
+        (should-have-invoked :player-turn)))
 
     (it "has the computer play o's turn if the computer mode is selected and the player token  is x"
       (with-redefs [cpu/play-computer-turn (stub :play-computer-turn {:return [[:x :o :x]
@@ -138,9 +147,9 @@
                                                           [:x :o :o]
                                                           [:o :x :x]]})
                     println (stub :println)]
-        (sut/game-loop [["" "" ""]
+        (sut/play-turn [["" "" ""]
                         ["" :x ""]
-                        ["" "" ""]] :versus-computer :some-difficulty :x)
+                        ["" "" ""]] {:game-type :versus-computer :difficulty :some-difficulty :player-token :x})
         (should-have-invoked :play-computer-turn {:with [[["" "" ""]
                                                           ["" :x ""]
                                                           ["" "" ""]] :some-difficulty]})))
@@ -149,7 +158,7 @@
       (with-redefs [terminal/print-board (stub :terminal/print-board)
                     board/get-win (stub :board/get-win {:return :x})
                     terminal/print-win (stub :terminal/print-win)]
-        (sut/game-loop :some-board :some-game-type :some-difficulty :some-player-token)
+        (sut/game-loop :some-board :some-settings)
         (should-have-invoked :terminal/print-board)
         (should-have-invoked :terminal/print-win)))
 
@@ -159,7 +168,7 @@
                     board/full-board? (stub :board/full-board? {:return true})
                     terminal/print-win (stub :terminal/print-win)
                     terminal/print-tie (stub :terminal/print-tie)]
-        (sut/game-loop :some-board :some-game-type :some-difficulty :some-player-token)
+        (sut/game-loop :some-board :some-settings)
         (should-have-invoked :terminal/print-board)
         (should-not-have-invoked :terminal/print-win)
         (should-have-invoked :terminal/print-tie)))

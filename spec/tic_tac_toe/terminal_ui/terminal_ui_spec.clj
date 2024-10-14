@@ -32,7 +32,7 @@
     (should= "Would you like to play against a computer? (y/n)\n" (with-out-str (sut/ask-for-game-type))))
 
   (it "asks the user what computer difficulty it would like to play against"
-    (should= "What difficulty would you like to set the computer at? (easy/medium/hard)\n" (with-out-str (sut/ask-for-difficulty))))
+    (should= "What difficulty would you like to set the computer at? (easy/med/hard)\n" (with-out-str (sut/ask-for-difficulty))))
 
   (it "asks the user if it would like to play as X or O"
     (should= "Would you like to play as X, or O? (x/o)\n" (with-out-str (sut/ask-for-player-token))))
