@@ -37,6 +37,9 @@
   (it "asks the user if it would like to play as X or O"
     (should= "Would you like to play as X, or O? (x/o)\n" (with-out-str (sut/ask-for-player-token))))
 
+  (it "asks the user if it would like to load a prior save"
+    (should= "The program has found a save file, would you like to load it? (y/n)\n" (with-out-str (sut/ask-for-database-load))))
+
   (context "User Input"
 
     (it "takes the users input and converts it into coordinates"
@@ -73,5 +76,10 @@
     (it "asks the token question and returns a token based on the users response"
       (with-redefs [sut/ask-for-player-token (stub :ask-for-player-token)]
         (should= :x (with-in-str "x" (sut/get-player-token)))
-        (should= :o (with-in-str "o" (sut/get-player-token)))))))
+        (should= :o (with-in-str "o" (sut/get-player-token)))))
+
+    (it "asks the database load question and returns a boolean based on the users response"
+      (with-redefs [sut/ask-for-database-load (stub :ask-for-database-load)]
+        (should (with-in-str "y" (sut/load-database?)))
+        (should-not (with-in-str "n" (sut/load-database?)))))))
 

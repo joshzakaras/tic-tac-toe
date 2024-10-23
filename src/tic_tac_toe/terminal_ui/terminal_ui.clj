@@ -17,6 +17,9 @@
 (defn print-new-game-alert []
   (println "Starting a new game of tic tac toe..."))
 
+(defn ask-for-database-load []
+  (println "The program has found a save file, would you like to load it? (y/n)"))
+
 (defn convert-tile [tile] (if (keyword? tile) (name tile) "☐"))
 
 (defn board-rows-to-string [board]
@@ -109,6 +112,14 @@
       (= "o" input) :o
       (= "x" input) :x
       :else (get-player-token))))
+
+(defn load-database? []
+  (ask-for-database-load)
+  (let [input (get-formatted-user-input)]
+    (cond
+      (= "y" input) true
+      (= "n" input) false
+      :else (load-database?))))
 
 (defn print-tie []
   (println "The game results in a tie..."))

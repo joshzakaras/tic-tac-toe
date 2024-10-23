@@ -3,94 +3,150 @@
             [tic-tac-toe.terminal-ui.terminal-ui :as terminal]
             [tic-tac-toe.game-board :as board]
             [tic-tac-toe.tic-tac-toe :as sut]
-            [tic-tac-toe.computer-player :as cpu]))
+            [tic-tac-toe.computer-player :as cpu]
+            [tic-tac-toe.database :as db]))
 
 (describe "Tic Tac Toe"
   (with-stubs)
 
-  (it "starts a new game"
-    (with-redefs [terminal/print-new-game-alert (stub :new-game-alert)
-                  terminal/print-input-format (stub :input-format)
-                  terminal/get-game-type (stub :get-game-type)
-                  terminal/get-difficulty (stub :get-difficulty)
-                  terminal/get-player-token (stub :get-player-token)
-                  sut/game-loop (stub :game-loop)]
+  (it "plays a new game if no save is found"
+    (with-redefs [sut/play-new-game (stub :play-new-game)
+                  sut/play-existing-game (stub :play-existing-game)
+                  db/existing-save? (stub :existing-save {:return false})]
       (sut/tic-tac-toe)
-      (should-have-invoked :new-game-alert)
-      (should-have-invoked :input-format)))
+      (should-have-invoked :play-new-game)
+      (should-not-have-invoked :play-existing-game)))
+  (it "plays an new game if a save is found and the user denies it"
+    (with-redefs [sut/play-new-game (stub :play-new-game)
+                  sut/play-existing-game (stub :play-existing-game)
+                  terminal/load-database? (stub :load-database {:return false})
+                  db/existing-save? (stub :existing-save {:return true})]
+      (sut/tic-tac-toe)
+      (should-have-invoked :play-new-game)
+      (should-not-have-invoked :play-existing-game)))
+  (it "plays the existing game if a save is found and the user accepts it"
+    (with-redefs [sut/play-new-game (stub :play-new-game)
+                  sut/play-existing-game (stub :play-existing-game)
+                  terminal/load-database? (stub :load-database {:return true})
+                  db/existing-save? (stub :existing-save {:return true})]
+      (sut/tic-tac-toe)
+      (should-have-invoked :play-existing-game)
+      (should-not-have-invoked :play-new-game)))
 
-  (it "asks the player if they want to play against a computer"
-    (with-redefs [terminal/print-new-game-alert (stub :new-game-alert)
-                  terminal/print-input-format (stub :input-format)
-                  terminal/get-game-type (stub :get-game-type)
-                  terminal/get-difficulty (stub :get-difficulty)
-                  terminal/get-player-token (stub :get-player-token)
-                  sut/game-loop (stub :game-loop)]
-      (sut/tic-tac-toe)
-      (should-have-invoked :get-game-type)))
+  (context "when starting from a new game"
+      (it "creates a new game"
+        (with-redefs [terminal/print-new-game-alert (stub :new-game-alert)
+                      terminal/print-input-format (stub :input-format)
+                      terminal/get-game-type (stub :get-game-type)
+                      terminal/get-difficulty (stub :get-difficulty)
+                      terminal/get-player-token (stub :get-player-token)
+                      sut/game-loop (stub :game-loop)]
+          (sut/play-new-game)
+          (should-have-invoked :new-game-alert)
+          (should-have-invoked :input-format)))
 
-  (it "asks for a computer difficulty if that mode is selected"
-    (with-redefs [terminal/print-new-game-alert (stub :new-game-alert)
-                  terminal/print-input-format (stub :input-format)
-                  terminal/get-difficulty (stub :get-difficulty)
-                  terminal/get-game-type (stub :get-game-type {:return :versus-computer})
-                  terminal/get-player-token (stub :get-player-token)
-                  sut/game-loop (stub :game-loop)]
-      (sut/tic-tac-toe)
-      (should-have-invoked :get-difficulty)))
+      (it "asks the player if they want to play against a computer"
+        (with-redefs [terminal/print-new-game-alert (stub :new-game-alert)
+                      terminal/print-input-format (stub :input-format)
+                      terminal/get-game-type (stub :get-game-type)
+                      terminal/get-difficulty (stub :get-difficulty)
+                      terminal/get-player-token (stub :get-player-token)
+                      sut/game-loop (stub :game-loop)]
+          (sut/play-new-game)
+          (should-have-invoked :get-game-type)))
 
-  (it "does not ask for computer difficulty if that mode is not selected"
-    (with-redefs [terminal/print-new-game-alert (stub :new-game-alert)
-                  terminal/print-input-format (stub :input-format)
-                  terminal/get-game-type (stub :get-game-type {:return :versus-player})
-                  terminal/get-difficulty (stub :get-difficulty)
-                  terminal/get-player-token (stub :get-player-token)
-                  sut/game-loop (stub :game-loop)]
-      (sut/tic-tac-toe)
-      (should-not-have-invoked :get-difficulty)))
+        (it "asks for a computer difficulty if that mode is selected"
+          (with-redefs [terminal/print-new-game-alert (stub :new-game-alert)
+                        terminal/print-input-format (stub :input-format)
+                        terminal/get-game-type (stub :get-game-type {:return :versus-computer})
+                        terminal/get-difficulty (stub :get-difficulty)
+                        terminal/get-player-token (stub :get-player-token)
+                        sut/game-loop (stub :game-loop)]
+            (sut/play-new-game)
+            (should-have-invoked :get-difficulty)))
 
-  (it "asks the player what they would like to play as if playing a computer"
-    (with-redefs [terminal/print-new-game-alert (stub :new-game-alert)
-                  terminal/print-input-format (stub :input-format)
-                  terminal/get-game-type (stub :get-game-type {:return :versus-computer})
-                  terminal/get-difficulty (stub :get-difficulty)
-                  terminal/get-player-token (stub :get-player-token)
-                  sut/game-loop (stub :game-loop)]
-      (sut/tic-tac-toe)
-      (should-have-invoked :get-player-token)))
+        (it "does not ask for computer difficulty if that mode is not selected"
+          (with-redefs [terminal/print-new-game-alert (stub :new-game-alert)
+                        terminal/print-input-format (stub :input-format)
+                        terminal/get-game-type (stub :get-game-type {:return :versus-player})
+                        terminal/get-difficulty (stub :get-difficulty)
+                        terminal/get-player-token (stub :get-player-token)
+                        sut/game-loop (stub :game-loop)]
+            (sut/play-new-game)
+            (should-not-have-invoked :get-difficulty)))
 
-  (it "does not ask the player what they would like to play as if not playing a computer"
-    (with-redefs [terminal/print-new-game-alert (stub :new-game-alert)
-                  terminal/print-input-format (stub :input-format)
-                  terminal/get-game-type (stub :get-game-type {:return :versus-player})
-                  terminal/get-difficulty (stub :get-difficulty)
-                  terminal/get-player-token (stub :get-player-token)
-                  sut/game-loop (stub :game-loop)]
-      (sut/tic-tac-toe)
-      (should-not-have-invoked :get-player-token)))
+      (it "asks the player what they would like to play as if playing a computer"
+        (with-redefs [terminal/print-new-game-alert (stub :new-game-alert)
+                      terminal/print-input-format (stub :input-format)
+                      terminal/get-game-type (stub :get-game-type {:return :versus-computer})
+                      terminal/get-difficulty (stub :get-difficulty)
+                      terminal/get-player-token (stub :get-player-token)
+                      sut/game-loop (stub :game-loop)]
+          (sut/play-new-game)
+          (should-have-invoked :get-player-token)))
 
-  (it "starts the core game loop for the computer mode"
-    (with-redefs [sut/game-loop (stub :game-loop)
-                  terminal/get-game-type (stub :get-game-type {:return :versus-computer})
-                  terminal/get-difficulty (stub :get-difficulty {:return :some-difficulty})
-                  terminal/get-player-token (stub :get-player-token {:return :some-token})
-                  println (stub :print-ln)]
-      (sut/tic-tac-toe)
-      (should-have-invoked :game-loop {:with [(board/new-board) {:game-type :versus-computer :difficulty :some-difficulty :player-token :some-token}]})))
+      (it "does not ask the player what they would like to play as if not playing a computer"
+        (with-redefs [terminal/print-new-game-alert (stub :new-game-alert)
+                      terminal/print-input-format (stub :input-format)
+                      terminal/get-game-type (stub :get-game-type)
+                      terminal/get-difficulty (stub :get-difficulty)
+                      terminal/get-player-token (stub :get-player-token)
+                      sut/game-loop (stub :game-loop)]
+          (sut/play-new-game)
+          (should-not-have-invoked :get-player-token)))
 
-  (it "starts the core game loop for the player mode"
-    (with-redefs [sut/game-loop (stub :game-loop)
-                  terminal/get-game-type (stub :get-game-type {:return :versus-player})
-                  terminal/get-difficulty (stub :get-difficulty {:return :some-difficulty})
-                  terminal/get-player-token (stub :get-player-token {:return :some-token})
-                  println (stub :print-ln)]
-      (sut/tic-tac-toe)
-      (should-have-invoked :game-loop {:with [(board/new-board) {:game-type :versus-player :difficulty nil :player-token nil}]})))
+      (it "starts the core game loop for the computer mode"
+        (with-redefs [sut/game-loop (stub :game-loop)
+                      terminal/get-game-type (stub :get-game-type {:return :versus-computer})
+                      terminal/get-difficulty (stub :get-difficulty {:return :some-difficulty})
+                      terminal/get-player-token (stub :get-player-token {:return :some-token})
+                      println (stub :print-ln)]
+          (sut/play-new-game)
+          (should-have-invoked :game-loop {:with [(board/new-board) {:game-type :versus-computer :difficulty :some-difficulty :player-token :some-token}]})))
+
+      (it "starts the core game loop for the player mode"
+        (with-redefs [sut/game-loop (stub :game-loop)
+                      terminal/get-game-type (stub :get-game-type {:return :versus-player})
+                      terminal/get-difficulty (stub :get-difficulty {:return :some-difficulty})
+                      terminal/get-player-token (stub :get-player-token {:return :some-token})
+                      println (stub :print-ln)]
+          (sut/play-new-game)
+          (should-have-invoked :game-loop {:with [(board/new-board) {:game-type :versus-player :difficulty nil :player-token nil}]}))))
+
+  (context "when starting from a save game"
+    (it "starts the game loop with the saved board and settings"
+      (with-redefs [db/read-stored-game (stub :read-stored-game {:return {:board :some-board :game-settings :some-game-settings}})
+                    sut/game-loop (stub :game-loop)]
+        (sut/play-existing-game)
+        (should-have-invoked :game-loop {:with [:some-board :some-game-settings]}))))
+
+  (it "clears the save data when a game is over"
+    (with-redefs [db/clear-save (stub :clear-save)
+                  terminal/print-win (stub :print-win)]
+      (sut/handle-win :some-board)
+      (should-have-invoked :clear-save))
+    (with-redefs [db/clear-save (stub :clear-save)
+                  terminal/print-tie (stub :print-tie)]
+      (sut/handle-tie)
+      (should-have-invoked :print-tie)))
 
   (context "Core Game Loop"
 
+    (it "saves the game data"
+      (with-redefs [terminal/print-board (stub :print-board)
+                    sut/handle-win (stub :handle-win)
+                    sut/handle-tie (stub :handle-tie)
+                    board/get-win (stub :get-win {:return :win})
+                    sut/player-turn (stub :player-turn {:return [[:x :o :x]
+                                                                 [:x :o :o]
+                                                                 [:o :x :x]]})
+                    db/store-game (stub :store-game)]
+        (sut/game-loop :some-board :some-settings)
+        (should-have-invoked :store-game {:with [:some-board :some-settings]})))
+
     (it "prints the game board"
       (with-redefs [terminal/print-board (stub :print-board)
+                    terminal/print-win (stub :print-win)
                     sut/player-turn (stub :turn {:return [[:x :o :x]
                                                           [:x :o :o]
                                                           [:o :x :x]]})
@@ -99,7 +155,7 @@
         (should-have-invoked :print-board {:with [(board/new-board)]})))
 
     (it "ends the game if there is a tie"
-      (with-redefs [terminal/print-tie (stub :print-tie)
+      (with-redefs [sut/handle-tie (stub :handle-tie)
                     sut/player-turn (stub :turn {:return [[:x :o :x]
                                                           [:x :o :o]
                                                           [:o :x :x]]})
@@ -107,10 +163,10 @@
         (sut/game-loop [[:x :o :x]
                         [:x :o :o]
                         [:o :x :x]] {:game-type :versus-computer :difficulty :some-difficulty :player-token :some-token})
-        (should-have-invoked :print-tie)))
+        (should-have-invoked :handle-tie)))
 
     (it "ends the game if there is a win"
-      (with-redefs [terminal/print-win (stub :print-win)
+      (with-redefs [sut/handle-win (stub :handle-win)
                     sut/player-turn (stub :turn {:return [[:x :o :x]
                                                           [:x :o :o]
                                                           [:o :x :x]]})
@@ -118,7 +174,7 @@
         (sut/game-loop [[:x :x :x]
                         [:x :x :x]
                         [:x :x :x]] {:game-type :versus-computer :difficulty :some-difficulty :player-token :some-token})
-        (should-have-invoked :print-win {:with [[[:x :x :x]
+        (should-have-invoked :handle-win {:with [[[:x :x :x]
                                                  [:x :x :x]
                                                  [:x :x :x]]]})))
 
