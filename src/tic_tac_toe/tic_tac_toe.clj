@@ -2,7 +2,8 @@
   (:require [tic-tac-toe.game-board :as board]
             [tic-tac-toe.terminal-ui.terminal-ui :as terminal]
             [tic-tac-toe.computer-player :as cpu]
-            [tic-tac-toe.database :as db]))
+            [tic-tac-toe.database :as db]
+            [tic-tac-toe.gui.gui :as gui]))
 
 (defn player-turn [board]
   (terminal/print-turn board)
@@ -41,11 +42,15 @@
                                        (terminal/get-difficulty))
                        :player-token (when (= :versus-computer game-type)
                                        (terminal/get-player-token))}]
-    (game-loop (board/new-board) game-settings)))
+    (if (terminal/use-gui?)
+      (gui/start-gui (board/new-board) game-settings)
+      (game-loop (board/new-board) game-settings))))
 
 (defn play-existing-game []
   (let [game-save (db/read-stored-game)]
-    (game-loop (:board game-save) (:game-settings game-save))))
+    (if (terminal/use-gui?)
+      (gui/start-gui (:board game-save) (:game-settings game-save))
+      (game-loop (:board game-save) (:game-settings game-save)))))
 
 (defn tic-tac-toe []
   (if (= true (db/existing-save?))

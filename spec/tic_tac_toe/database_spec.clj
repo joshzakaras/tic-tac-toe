@@ -31,6 +31,6 @@
     (with-redefs [sut/read-stored-game (stub :read-stored-game {:return :some-data})]
       (should (sut/existing-save?))))
 
-  (it "returns nil if it cannot read from the database file"
+  (it "returns \"\" if it cannot read from the database file"
     (with-redefs [slurp (stub :slurp {:throw Exception})]
       (should= "" (sut/read-stored-game)))))

@@ -40,6 +40,9 @@
   (it "asks the user if it would like to load a prior save"
     (should= "The program has found a save file, would you like to load it? (y/n)\n" (with-out-str (sut/ask-for-database-load))))
 
+  (it "asks the user if it would like to use a GUI to play"
+    (should= "Would you like to play with a GUI? (y/n)\n" (with-out-str (sut/ask-for-gui))))
+
   (context "User Input"
 
     (it "takes the users input and converts it into coordinates"
@@ -81,5 +84,10 @@
     (it "asks the database load question and returns a boolean based on the users response"
       (with-redefs [sut/ask-for-database-load (stub :ask-for-database-load)]
         (should (with-in-str "y" (sut/load-database?)))
-        (should-not (with-in-str "n" (sut/load-database?)))))))
+        (should-not (with-in-str "n" (sut/load-database?)))))
+
+    (it "asks the gui question and returns a boolean based on the users response"
+      (with-redefs [sut/ask-for-gui (stub :ask-for-gui)]
+        (should (with-in-str "y" (sut/use-gui?)))
+        (should-not (with-in-str "n" (sut/use-gui?)))))))
 

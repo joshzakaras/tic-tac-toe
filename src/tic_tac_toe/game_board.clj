@@ -65,3 +65,6 @@
   (cond
     (did-player-win? board :x) :x
     (did-player-win? board :o) :o))
+
+(defn is-there-win? [board]
+  (or (= :x (get-win board)) (= :o (get-win board))))

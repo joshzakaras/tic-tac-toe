@@ -20,6 +20,9 @@
 (defn ask-for-database-load []
   (println "The program has found a save file, would you like to load it? (y/n)"))
 
+(defn ask-for-gui []
+  (println "Would you like to play with a GUI? (y/n)"))
+
 (defn convert-tile [tile] (if (keyword? tile) (name tile) "☐"))
 
 (defn board-rows-to-string [board]
@@ -120,6 +123,14 @@
       (= "y" input) true
       (= "n" input) false
       :else (load-database?))))
+
+(defn use-gui? []
+  (ask-for-gui)
+  (let [input (get-formatted-user-input)]
+    (cond
+      (= "y" input) true
+      (= "n" input) false
+      :else (use-gui?))))
 
 (defn print-tie []
   (println "The game results in a tie..."))
