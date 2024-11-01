@@ -1,4 +1,4 @@
-(ns tic-tac-toe.terminal-ui.terminal-ui
+(ns tic-tac-toe.terminal.ui
   (:require [clojure.string :as str]
             [tic-tac-toe.game-board :as board]))
 
@@ -22,6 +22,9 @@
 
 (defn ask-for-gui []
   (println "Would you like to play with a GUI? (y/n)"))
+
+(defn ask-for-board-size []
+  (println "Would you like to play on a 3x3 or 4x4 board? (3/4)"))
 
 (defn convert-tile [tile] (if (keyword? tile) (name tile) "☐"))
 
@@ -134,3 +137,12 @@
 
 (defn print-tie []
   (println "The game results in a tie..."))
+
+(defn get-board-size []
+  (ask-for-board-size)
+  (let [input (get-formatted-user-input)]
+    (cond
+      (= "3" input) 3
+      (= "4" input) 4
+      :else (get-board-size))))
+

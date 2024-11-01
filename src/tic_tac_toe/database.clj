@@ -2,16 +2,19 @@
 
 (def database-path "./database.txt")
 
-(defn store-game [board game-settings]
-  (spit database-path {:board board :game-settings game-settings}))
+(defn remove-console [game]
+  (dissoc game :console))
 
-(defn clear-save []
+(defn store-game! [game]
+  (spit database-path (remove-console game)))
+
+(defn clear-save! []
   (spit database-path ""))
 
 (defn read-stored-game []
   (try
   (read-string (slurp database-path))
-  (catch Exception e "")))
+  (catch Exception e {})))
 
 (defn existing-save? []
-  (not (= "" (read-stored-game))))
+  (not (= {} (read-stored-game))))

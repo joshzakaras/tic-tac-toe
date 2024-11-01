@@ -1,5 +1,6 @@
 (ns tic-tac-toe.game-board-spec
   (:require [speclj.core :refer :all]
+            [tic-tac-toe.game-board :as board]
             [tic-tac-toe.game-board :as sut]))
 
 (def empty-board [["" "" ""] ["" "" ""] ["" "" ""]])
@@ -44,12 +45,21 @@
     (should= :o (sut/get-next-turn empty-board))
     (should= :x (sut/get-next-turn [[:x "" ""] ["" "" ""] ["" "" ""]] )))
 
-  (it "checks the board for a win"
+  (it "gets the winning token from the board"
     (should-not (sut/get-win empty-board))
     (should= :x (sut/get-win [[:x :x :x] ["" "" ""] ["" "" ""]]))
     (should= :x (sut/get-win [[:x "" ""] [:x "" ""] [:x "" ""]]))
     (should= :x (sut/get-win [[:x "" ""] ["" :x ""] ["" "" :x]]))
     (should= :o (sut/get-win [[:o :o :o] ["" "" ""] ["" "" ""]]))
     (should= :o (sut/get-win [[:o "" ""] [:o "" ""] [:o "" ""]]))
-    (should= :o (sut/get-win [[:o "" ""] ["" :o ""] ["" "" :o]]))))
+    (should= :o (sut/get-win [[:o "" ""] ["" :o ""] ["" "" :o]])))
+
+  (it "checks if the game has been won"
+    (should (sut/is-there-win? [[:x :x :x] ["" "" ""] ["" "" ""]]))
+    (should (sut/is-there-win? [[:o :o :o] ["" "" ""] ["" "" ""]]))
+    (should-not (sut/is-there-win? empty-board)))
+
+  (it "checks if the game has been tied"
+    (should (sut/is-there-tie? [[:x :o :x][:x :o :x][:o :x :o]]))
+    (should-not (sut/is-there-tie? [[:x :x :x][:x :x :x][:x :x :X]]))))
 

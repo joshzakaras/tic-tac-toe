@@ -1,6 +1,6 @@
-(ns tic-tac-toe.terminal-ui.terminal-ui-spec
+(ns tic-tac-toe.terminal.ui-spec
   (:require [speclj.core :refer :all]
-            [tic-tac-toe.terminal-ui.terminal-ui :as sut]))
+            [tic-tac-toe.terminal.ui :as sut]))
 
 (def empty-board [["" "" ""] ["" "" ""] ["" "" ""]])
 
@@ -42,6 +42,9 @@
 
   (it "asks the user if it would like to use a GUI to play"
     (should= "Would you like to play with a GUI? (y/n)\n" (with-out-str (sut/ask-for-gui))))
+
+  (it "asks the user if it would like to play 3x3 or 4x4 tic tac toe"
+    (should= "Would you like to play on a 3x3 or 4x4 board? (3/4)\n" (with-out-str (sut/ask-for-board-size))))
 
   (context "User Input"
 
@@ -89,5 +92,10 @@
     (it "asks the gui question and returns a boolean based on the users response"
       (with-redefs [sut/ask-for-gui (stub :ask-for-gui)]
         (should (with-in-str "y" (sut/use-gui?)))
-        (should-not (with-in-str "n" (sut/use-gui?)))))))
+        (should-not (with-in-str "n" (sut/use-gui?)))))
+
+    (it "asks the board size question and returns a number based on the users response"
+      (with-redefs [sut/ask-for-board-size (stub :ask-for-board-size)]
+        (should= 3 (with-in-str "3" (sut/get-board-size)))
+        (should= 4 (with-in-str "4" (sut/get-board-size)))))))
 

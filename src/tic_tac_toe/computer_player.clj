@@ -87,7 +87,8 @@
     generate-calculated-move))
 
 (defn play-computer-turn [board difficulty]
-  (board/set-square (cond
-                      (= :hard difficulty) (generate-calculated-move board)
-                      (= :med difficulty) ((random-generation-type) board)
-                      :else (generate-random-move board)) (board/get-current-turn board) board))
+  (let [play (cond
+               (= :hard difficulty) (generate-calculated-move board)
+               (= :med difficulty) ((random-generation-type) board)
+               :else (generate-random-move board))]
+    (board/set-square  play (board/get-current-turn board) board)))

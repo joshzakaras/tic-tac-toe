@@ -68,3 +68,6 @@
 
 (defn is-there-win? [board]
   (or (= :x (get-win board)) (= :o (get-win board))))
+
+(defn is-there-tie? [board]
+  (and (full-board? board) (not (is-there-win? board))))
