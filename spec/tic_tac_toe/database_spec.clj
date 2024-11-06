@@ -10,11 +10,19 @@
     (should= "./database.txt" sut/database-path))
 
   (it "removes the console from the game to save"
-    (should= {:some-game-keys :some-game-values} (sut/remove-console {:some-game-keys :some-game-values :console :terminal})))
+    (should= {:some-game-keys :some-game-values} (sut/remove-console {:some-game-keys :some-game-values :console :some-console})))
 
-  (it "stores a game board in the database file"
-    (with-redefs [spit (stub :spit)]
+  (it "removes the screen from the game to save"
+    (should= {:some-game-keys :some-game-values} (sut/remove-screen {:some-game-keys :some-game-values :screen :some-screen})))
+
+  (it "applies all of the save formatting functions to the game"
+    (should= {:some-game-keys :some-game-values} (sut/format-game {:some-game-keys :some-game-values :console :some-console :screen :some-screen})))
+
+  (it "formats and stores a game in the database file"
+    (with-redefs [spit (stub :spit)
+                  sut/format-game (stub :format-game {:return {:some-game-keys :some-game-values}})]
       (sut/store-game! {:some-game-keys :some-game-values})
+      (should-have-invoked :format-game)
       (should-have-invoked :spit {:with [sut/database-path {:some-game-keys :some-game-values}]})))
 
   (it "reads the game board from the database file"

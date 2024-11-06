@@ -1,53 +1,47 @@
 (ns tic-tac-toe.gui.gui-spec
-  (:require [speclj.core :refer :all]
+  (:require [quil.core :as q]
+            [quil.middleware :as m]
+            [speclj.core :refer :all]
+            [tic-tac-toe.core :as core]
             [tic-tac-toe.database :as db]
-            [tic-tac-toe.gui.gui :as sut]
-            [tic-tac-toe.gui.db-load-screen :as db-load-screen]
-            [tic-tac-toe.gui.game-screen :as game-screen]
-            [tic-tac-toe.gui.game-setup-screen :as setup-screen]))
-
-
+            [tic-tac-toe.gui.screen-core :as screens]
+            [tic-tac-toe.gui.screens.db-load-screen :as db-load-screen]
+            [tic-tac-toe.gui.gui :as sut]))
 
 (describe "A Tic Tac Toe GUI using Quil"
   (with-stubs)
 
-  (it "has a setup function that either sets the starting screen to the db
-  load screen or the new game setup screen depending on if a game save is found."
-    (with-redefs [db/existing-save? (stub :existing-save? {:return true})]
-      (should= {:gui-screen :db-load-screen :board nil :game-settings nil} (sut/setup)))
-    (with-redefs [db/existing-save? (stub :existing-save? {:return false})]
-      (should= {:gui-screen :setup-screen :board nil :game-settings nil} (sut/setup))))
+  (it "starts a quil sketch to handle the GUI process"
+    (with-redefs [q/sketch (stub :sketch)]
+      (core/start-game! {:console :gui})
+      (should-have-invoked :sketch)))
 
-  (it "has a draw function that calls a screens draw function based on the state"
-    (with-redefs [db-load-screen/draw-screen (stub :db-load-draw-screen)]
-      (sut/draw {:gui-screen :db-load-screen})
-      (should-have-invoked :db-load-draw-screen))
+  (context "Setup Method"
+    (it "sets the state of the game to setup"
+      (with-redefs [db/existing-save? (stub :existing-save? {:return true})]
+        (should= :setup (:state (core/setup {:console :gui})))))
 
-    (with-redefs [game-screen/draw-screen (stub :game-draw-screen)]
-      (sut/draw {:gui-screen :game-screen})
-      (should-have-invoked :game-draw-screen))
+    (it "sets the default screen to load db if a database is found"
+      (with-redefs [db/existing-save? (stub :existing-save {:return true})]
+        (should= :db-load (:screen (core/setup {:console :gui})))))
 
-    (with-redefs [setup-screen/draw-screen (stub :setup-draw-screen)]
-      (sut/draw {:gui-screen :setup-screen})
-      (should-have-invoked :setup-draw-screen)))
+    (it "sets the starting screen to new-game if a database is not found"
+      (with-redefs [db/existing-save? (stub :existing-save? {:return false})]
+        (should= :game-type-select (:screen (core/setup {:console :gui}))))))
 
-  (it "has a mouse clicked function that calls a screens mouse clicked function based on the state"
-    (with-redefs [db-load-screen/on-mouse-clicked (stub :db-on-mouse-clicked)
-                  game-screen/on-mouse-clicked (stub :game-on-mouse-clicked)
-                  setup-screen/on-mouse-clicked (stub :setup-on-mouse-clicked)]
-      (sut/mouse-clicked {:gui-screen :db-load-screen} :some-event)
-      (should-have-invoked :db-on-mouse-clicked))
+  (context "Draw Method"
+    (it "draws the currently selected screen"
+      (with-redefs [screens/draw (stub :screen-draw)]
+        (core/draw {:console :gui :screen :some-screen})
+        (should-have-invoked :screen-draw))))
 
-    (with-redefs [db-load-screen/on-mouse-clicked (stub :db-on-mouse-clicked)
-                  game-screen/on-mouse-clicked (stub :game-on-mouse-clicked)
-                  setup-screen/on-mouse-clicked (stub :setup-on-mouse-clicked)]
-      (sut/mouse-clicked {:gui-screen :game-screen} :some-event)
-      (should-have-invoked :game-on-mouse-clicked))
+  (context "Mouse Click Event"
 
-    (with-redefs [db-load-screen/on-mouse-clicked (stub :db-on-mouse-clicked)
-                  game-screen/on-mouse-clicked (stub :game-on-mouse-clicked)
-                  setup-screen/on-mouse-clicked (stub :setup-on-mouse-clicked)]
-      (sut/mouse-clicked {:gui-screen :setup-screen} :some-event)
-      (should-have-invoked :setup-on-mouse-clicked)))
+    (it "calls the screens on click event with the mouse values attached to the game"
+      (with-redefs [screens/on-click (stub :on-click {:return {:some-new-keys :some-new-values}})]
+        (sut/on-mouse-click {:some-game-keys :some-game-values} {:some-mouse-keys :some-mouse-values})
+        (should-have-invoked :on-click {:with [{:some-game-keys :some-game-values :mouse {:some-mouse-keys :some-mouse-values}}]})))
 
-  )
+    (it "disposes the mouse event when returning the game state"
+      (with-redefs [screens/on-click (stub :on-click {:return {:some-new-keys :some-new-values :mouse :some-mouse-event}})]
+        (should-not (:mouse (sut/on-mouse-click {:some-game-keys :some-game-values} {:some-mouse-keys :some-mouse-values})))))))
