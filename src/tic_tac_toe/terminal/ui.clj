@@ -26,6 +26,9 @@
 (defn ask-for-board-size []
   (println "Would you like to play on a 3x3 or 4x4 board? (3/4)"))
 
+(defn print-tie []
+  (println "The game results in a tie..."))
+
 (defn convert-tile [tile] (if (keyword? tile) (name tile) "☐"))
 
 (defn board-rows-to-string [board]
@@ -59,14 +62,14 @@
 (defn right-size? [input]
   (= 2 (count input)))
 
-(defn in-bounds? [input]
+(defn in-bounds? [input board]
   (->> (map int input)
-       (every? #(and (>= % (int \0)) (<= % (int \2))))))
+       (every? #(and (>= % (int \0)) (<= % (+ 47 (count board)))))))
 
-(defn invalid-coordinate-input? [input]
+(defn invalid-coordinate-input? [input board]
   (not (and
          (right-size? input)
-         (in-bounds? input))))
+         (in-bounds? input board))))
 
 (declare get-player-move)
 
@@ -91,7 +94,7 @@
 (defn get-player-move [board]
   (let [input (read-line)]
     (cond
-      (invalid-coordinate-input? input) (handle-invalid-coordinate-input board)
+      (invalid-coordinate-input? input board) (handle-invalid-coordinate-input board)
       (not (board/valid-turn? (input-to-coords input) board)) (handle-invalid-turn board)
       :else (input-to-coords input))))
 
@@ -138,9 +141,6 @@
       (= "y" input) true
       (= "n" input) false
       :else (use-gui?))))
-
-(defn print-tie []
-  (println "The game results in a tie..."))
 
 (defn get-board-size []
   (ask-for-board-size)

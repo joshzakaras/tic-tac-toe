@@ -74,7 +74,7 @@
                                                            [:o :x :x :x]])))
     (it "blocks the opponent from winning"
       (should= {:row 0 :column 0} (sut/generate-best-move [["" :o :o]
-                                                           ["" "" :x]
+                                                           ["" :x ""]
                                                            ["" :x ""]])))
 
     (it "blocks an opponents fork"
