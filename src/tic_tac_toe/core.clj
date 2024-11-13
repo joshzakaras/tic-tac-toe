@@ -7,3 +7,5 @@
 (defmulti update :console)
 
 (defmulti draw :console)
+
+(defmulti update-current-turn :current-turn)

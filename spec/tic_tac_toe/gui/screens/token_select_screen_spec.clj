@@ -2,7 +2,7 @@
   (:require [quil.core :as q]
             [speclj.core :refer :all]
             [tic-tac-toe.gui.screen-core :as screens]
-            [tic-tac-toe.gui.screens.token-select-screen :as sut]))
+            [tic-tac-toe.gui.screens.token-select :as sut]))
 
 (def black [0 0 0])
 (def light-red [255 47 76])

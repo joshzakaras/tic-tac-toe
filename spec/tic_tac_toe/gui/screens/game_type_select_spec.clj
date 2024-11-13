@@ -1,10 +1,10 @@
-(ns tic-tac-toe.gui.screens.game-type-select-screen-spec
+(ns tic-tac-toe.gui.screens.game-type-select-spec
   (:require [quil.core :as q]
             [speclj.core :refer :all]
             [tic-tac-toe.game-board :as board]
             [tic-tac-toe.gui.mouse-helper-functions :as mouse-helper]
             [tic-tac-toe.gui.screen-core :as screens]
-            [tic-tac-toe.gui.screens.game-type-select-screen :as sut]))
+            [tic-tac-toe.gui.screens.game-type-select :as sut]))
 
 (def confirmation-green [35 101 51])
 (def black [0 0 0])
@@ -67,9 +67,6 @@
     (it "sets the screen to the computer difficulty screen when the confirmation box is clicked"
       (should= :difficulty-select (:screen (screens/on-click {:screen :game-type-select :state :setup :mouse {:x 15 :y 45}}))))
 
-    (it "sets the board to the new board when the confirmation box is clicked"
-      (should= (board/new-board) (:board (screens/on-click {:screen :game-type-select :state :setup :mouse {:x 15 :y 45}}))))
-
     (it "sets the game type to versus player when the denial box is clicked"
       (should= :versus-player (:game-type (screens/on-click {:screen :game-type-select :state :setup :mouse {:x 125 :y 45}}))))
 
@@ -78,9 +75,6 @@
 
     (it "sets the state to playing when the denial box is clicked"
       (should= :playing (:state (screens/on-click {:screen :game-type-select :state :setup :mouse {:x 125 :y 45}}))))
-
-    (it "sets the board to the new board when the confirmation box is clicked"
-      (should= (board/new-board) (:board (screens/on-click {:screen :game-type-select :state :setup :mouse {:x 125 :y 45}}))))
 
     (it "sets the current player to :player when the denial box is clicked"
       (should= :player (:current-turn (screens/on-click {:screen :game-type-select :state :setup :mouse {:x 125 :y 45}}))))))

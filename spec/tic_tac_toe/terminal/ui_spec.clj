@@ -1,5 +1,6 @@
 (ns tic-tac-toe.terminal.ui-spec
   (:require [speclj.core :refer :all]
+            [tic-tac-toe.game-board :as board]
             [tic-tac-toe.terminal.ui :as sut]))
 
 (def empty-board [["" "" ""] ["" "" ""] ["" "" ""]])
@@ -96,6 +97,6 @@
 
     (it "asks the board size question and returns a number based on the users response"
       (with-redefs [sut/ask-for-board-size (stub :ask-for-board-size)]
-        (should= 3 (with-in-str "3" (sut/get-board-size)))
-        (should= 4 (with-in-str "4" (sut/get-board-size)))))))
+        (should= (board/new-board 3 3) (with-in-str "3" (sut/get-board-size)))
+        (should= (board/new-board 4 4) (with-in-str "4" (sut/get-board-size)))))))
 

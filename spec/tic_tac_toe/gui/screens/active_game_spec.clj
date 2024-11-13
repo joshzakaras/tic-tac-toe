@@ -1,4 +1,4 @@
-(ns tic-tac-toe.gui.screens.game-screen-spec
+(ns tic-tac-toe.gui.screens.active-game-spec
   (:require [quil.core :as q]
             [speclj.core :refer :all]
             [tic-tac-toe.computer-player :as cpu]
@@ -6,7 +6,7 @@
             [tic-tac-toe.game-board :as board]
             [tic-tac-toe.game-state-changers :as game-state]
             [tic-tac-toe.gui.screen-core :as screens]
-            [tic-tac-toe.gui.screens.game-screen :as sut]))
+            [tic-tac-toe.gui.screens.active-game :as sut]))
 
 (def light-red [255 47 76])
 (def black [0 0 0])

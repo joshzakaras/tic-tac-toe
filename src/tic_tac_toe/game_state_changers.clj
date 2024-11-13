@@ -1,5 +1,6 @@
 (ns tic-tac-toe.game-state-changers
-  (:require [tic-tac-toe.game-board :as board]))
+  (:require [tic-tac-toe.core :as core]
+            [tic-tac-toe.game-board :as board]))
 
 (defn get-current-game-state [game]
   (cond
@@ -10,12 +11,10 @@
 (defn maybe-update-game-state [game]
   (assoc game :state (get-current-game-state game)))
 
-(defmulti update-current-turn :current-turn)
-
-(defmethod update-current-turn :computer [game]
+(defmethod core/update-current-turn :computer [game]
   (assoc game :current-turn :player))
 
-(defmethod update-current-turn :player [game]
+(defmethod core/update-current-turn :player [game]
   (if (= :versus-computer (:game-type game))
     (assoc game :current-turn :computer)
     game))

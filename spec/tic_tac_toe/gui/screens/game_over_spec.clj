@@ -1,9 +1,9 @@
-(ns tic-tac-toe.gui.screens.game-over-screen-spec
+(ns tic-tac-toe.gui.screens.game-over-spec
   (:require [quil.core :as q]
             [speclj.core :refer :all]
             [tic-tac-toe.game-board :as board]
             [tic-tac-toe.gui.screen-core :as screens]
-            [tic-tac-toe.gui.screens.game-over-screen :as sut]))
+            [tic-tac-toe.gui.screens.game-over :as sut]))
 
 (def black [0 0 0])
 

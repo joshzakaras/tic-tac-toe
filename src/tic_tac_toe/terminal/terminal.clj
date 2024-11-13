@@ -1,9 +1,9 @@
 (ns tic-tac-toe.terminal.terminal
   (:require [tic-tac-toe.core :as core]
             [tic-tac-toe.database :as db]
-            [tic-tac-toe.terminal.update :as update]
-            [tic-tac-toe.terminal.draw :as draw]
-            [tic-tac-toe.terminal.setup :as setup]))
+            [tic-tac-toe.terminal.setup]
+            [tic-tac-toe.terminal.draw]
+            [tic-tac-toe.terminal.update]))
 
 (defmulti run-game :state)
 

@@ -31,20 +31,24 @@
 (defn board-rows-to-string [board]
   (->> (flatten board)
        (map convert-tile)
-       (partition 3)
+       (partition (count board))
        (map #(str/join " " %))))
 
 (defn add-coordinates-to-rows [board]
-  (map #(str % " " (nth board %)) (range 3)))
+  (map #(str % " " (nth board %)) (range (count board))))
 
 (defn board-to-string [board]
   (->> (str/join "\n" board)))
 
+(defn add-coordinates-to-columns [board]
+  (str "  "(->> (range 0 (count (first board)))
+            (str/join " ")) "\n"))
+
 (defn print-board [board]
-  (println (->> (board-rows-to-string board)
-                add-coordinates-to-rows
-                board-to-string
-                (str "  0 1 2\n"))))
+  (println (str (add-coordinates-to-columns board)
+                (->> (board-rows-to-string board)
+                     add-coordinates-to-rows
+                     board-to-string))))
 
 (defn print-turn [board]
   (println (str "Player " (convert-tile (board/get-current-turn board)) " please input your turn: ")))
@@ -142,7 +146,7 @@
   (ask-for-board-size)
   (let [input (get-formatted-user-input)]
     (cond
-      (= "3" input) 3
-      (= "4" input) 4
+      (= "3" input) (board/new-board 3 3)
+      (= "4" input) (board/new-board 4 4)
       :else (get-board-size))))
 

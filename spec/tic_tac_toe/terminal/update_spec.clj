@@ -22,19 +22,19 @@
 
   (it "plays the turn when state is playing"
     (with-redefs [sut/play-turn (stub :play-turn)
-                  game-state/update-current-turn (stub :update-current-turn)]
+                  core/update-current-turn (stub :update-current-turn)]
       (sut/maybe-play-turn {:state :playing})
       (should-have-invoked :play-turn)))
 
   (it "does not play the turn when the state is not playing"
     (with-redefs [sut/play-turn (stub :play-turn)
-                  game-state/update-current-turn (stub :update-current-turn)]
+                  core/update-current-turn (stub :update-current-turn)]
       (sut/maybe-play-turn {:state :not-playing})
       (should-not-have-invoked :play-turn)))
 
   (it "updates the current turn when maybe-play-turn succeeds"
     (with-redefs [sut/play-turn (stub :play-turn)
-                  game-state/update-current-turn (stub :update-current-turn)]
+                  core/update-current-turn (stub :update-current-turn)]
       (sut/maybe-play-turn {:state :playing})
       (should-have-invoked :update-current-turn)))
 

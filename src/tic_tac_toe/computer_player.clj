@@ -1,82 +1,77 @@
 (ns tic-tac-toe.computer-player
   (:require [tic-tac-toe.game-board :as board]))
 
+(defn generate-random-coords [board]
+  {:row (rand-int (count (first board))) :column (rand-int (count board))})
+
 (defn format-coords [unformatted-coords]
   {:row (first unformatted-coords) :column (last unformatted-coords)})
 
-(defn generate-unformatted-coords []
-  (->> (for [x (range 3)]
-         (map #(vector x %) (range 3)))
+(defn generate-unformatted-coords [board]
+  (->> (for [x (range (count (first board)))]
+         (map #(vector x %) (range (count board))))
        flatten
        (partition 2)))
 
-(defn generate-coords []
-  (->> (generate-unformatted-coords)
+(defn generate-coords [board]
+  (->> (generate-unformatted-coords board)
        (map #(format-coords %))))
 
 (defn generate-legal-moves [board]
-  (->> (generate-coords)
+  (->> (generate-coords board)
        (filter #(board/valid-turn? % board))))
 
-(defn generate-moves-from-win [board token]
-  (->> (generate-legal-moves board)
-       (map #(vector % (board/set-square % token board)))
-       (filter #(board/did-player-win? (last %) token))
-       first
-       first))
 
-(defn generate-winning-move [board]
-  (generate-moves-from-win board (board/get-current-turn board)))
-
-(defn generate-blocking-move [board]
-  (generate-moves-from-win board (board/get-next-turn board)))
-
-(defn center-move-valid? [board]
-  (board/valid-turn? {:row 1 :column 1} board))
-
-(defn generate-opposing-corner-move [board]
-  (->> (for [row [0 2]
-             column [0 2]]
-         (when (= (board/get-next-turn board) (board/get-square {:row row :column column} board))
-           {:row (- 2 row) :column (- 2 column)}))
-       (filter some?)
-       (filter #(board/valid-turn? % board))
-       first))
-
-(defn generate-empty-corner-move [board]
-  (->> (for [row [0 2]
-             column [0 2]]
-         {:row row :column column})
-       (filter #(board/valid-turn? % board))
-       first))
-
-(defn generate-empty-side-move [board]
-  (->> (vector {:row 0 :column 1} {:row 1 :column 0} {:row 1 :column 2} {:row 2 :column 1})
-       (filter #(board/valid-turn? % board))
-       first))
-
-(defn opponent-fork? [board]
-  (let [opponent-tile (board/get-next-turn board)]
-    (or
-      (every? #(= opponent-tile %) [(board/get-square {:row 0 :column 0} board) (board/get-square {:row 2 :column 2} board)])
-      (every? #(= opponent-tile %) [(board/get-square {:row 0 :column 2} board) (board/get-square {:row 2 :column 0} board)]))))
-
-(defn generate-anti-fork-move [board]
-  (when (opponent-fork? board)
-    (generate-empty-side-move board)))
-
-(defn generate-calculated-move [board]
+(defn score-board [board token]
   (cond
-    (generate-winning-move board) (generate-winning-move board)
-    (generate-blocking-move board) (generate-blocking-move board)
-    (generate-anti-fork-move board) (generate-anti-fork-move board)
-    (center-move-valid? board) {:row 1 :column 1}
-    (generate-opposing-corner-move board) (generate-opposing-corner-move board)
-    (generate-empty-corner-move board) (generate-empty-corner-move board)
-    :else (generate-empty-side-move board)))
+    (board/is-there-tie? board) 0
+    (= token (board/get-win board)) 1
+    :else -1))
+
+(defn next-step [step]
+  (if (= max step)
+    min
+    max))
+
+(defn maybe-alpha-beta [step board token]
+  (let [alpha-beta (->> (generate-legal-moves board)
+                        (map #(board/set-square % (board/get-current-turn board) board))
+                        (filter #(board/game-over? %))
+                        (map #(score-board % token)))]
+    (when (> (count alpha-beta) 0)
+      (apply step alpha-beta))))
+
+(def max-depth 3)
+
+(defn mini-max [step board token move depth]
+  (let [current-turn (board/get-current-turn board)
+        projected-board (board/set-square move current-turn board)]
+    (cond
+      (board/game-over? projected-board) (/ (score-board projected-board token) depth)
+      (maybe-alpha-beta step projected-board token) (/ (maybe-alpha-beta step projected-board token) depth)
+      (= max-depth depth) 0
+      :else (->> (generate-legal-moves projected-board)
+           (map #(mini-max (next-step step) projected-board token % (inc depth)))
+           (apply step)))))
+
+(defn score-move [board token move]
+  (mini-max max board token move 1))
+
+(defn pair-score-with-move [board token move]
+  {:score (score-move board token move) :move move})
+
+(defn generate-best-move [board]
+  (cond
+    (= (board/new-board (count board) (count board)) board) {:row 0 :column 0}
+    (and (board/count-values board (board/get-current-turn board)) (board/valid-turn? {:row 1 :column 1} board)) {:row 1 :column 1}
+    :else (->> (generate-legal-moves board)
+         (map #(pair-score-with-move board (board/get-current-turn board) %))
+         (sort-by :score >)
+         first
+         :move)))
 
 (defn generate-random-move [board]
-  (let [random-coords {:row (rand-int 3) :column (rand-int 3)}]
+  (let [random-coords (generate-random-coords board)]
     (if (board/valid-turn? random-coords board)
       random-coords
       (generate-random-move board))))
@@ -84,11 +79,11 @@
 (defn random-generation-type []
   (if (= 0 (rand-int 9))
     generate-random-move
-    generate-calculated-move))
+    generate-best-move))
 
 (defn play-computer-turn [board difficulty]
   (let [play (cond
-               (= :hard difficulty) (generate-calculated-move board)
+               (= :hard difficulty) (generate-best-move board)
                (= :med difficulty) ((random-generation-type) board)
                :else (generate-random-move board))]
-    (board/set-square  play (board/get-current-turn board) board)))
+    (board/set-square play (board/get-current-turn board) board)))

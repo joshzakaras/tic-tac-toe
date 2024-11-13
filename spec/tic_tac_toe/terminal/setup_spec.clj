@@ -43,38 +43,45 @@
         (should-not-have-invoked :read-stored-game))))
 
   (context "Creating a New Game"
-    (it "creates a new game board"
-      (with-redefs [terminal/get-game-type (stub :get-game-type {:return :some-type})]
+    (it "gets the game board from the user"
+      (with-redefs [terminal/get-game-type (stub :get-game-type {:return :some-type})
+                    terminal/get-board-size (stub :get-board-size {:return (board/new-board)})]
         (should= (board/new-board) (:board (sut/create-new-game {:console :terminal})))))
 
     (it "gets the game type from the user"
-      (with-redefs [terminal/get-game-type (stub :get-game-type {:return :some-type})]
+      (with-redefs [terminal/get-game-type (stub :get-game-type {:return :some-type})
+                    terminal/get-board-size (stub :get-board-size {:return (board/new-board)})]
         (should= :some-type (:game-type (sut/create-new-game {:console :terminal})))))
 
     (it "sets the first turn of the game to player by default"
-      (with-redefs [terminal/get-game-type (stub :get-game-type {:return :some-type})]
+      (with-redefs [terminal/get-game-type (stub :get-game-type {:return :some-type})
+                    terminal/get-board-size (stub :get-board-size {:return (board/new-board)})]
         (should= :player (:current-turn (sut/create-new-game {:console :terminal})))))
 
     (context "When it's a Versus Computer Game"
       (it "gets the difficulty from the user"
         (with-redefs [terminal/get-game-type (stub :get-game-type {:return :versus-computer})
                       terminal/get-difficulty (stub :get-difficulty {:return :some-difficulty})
-                      terminal/get-player-token (stub :get-player-token {:return :some-token})]
+                      terminal/get-player-token (stub :get-player-token {:return :some-token})
+                      terminal/get-board-size (stub :get-board-size {:return (board/new-board)})]
           (should= :some-difficulty (:difficulty (sut/create-new-game {:console :terminal})))))
 
       (it "gets the player token from the user"
         (with-redefs [terminal/get-game-type (stub :get-game-type {:return :versus-computer})
                       terminal/get-difficulty (stub :get-difficulty {:return :some-difficulty})
-                      terminal/get-player-token (stub :get-player-token {:return :some-token})]
+                      terminal/get-player-token (stub :get-player-token {:return :some-token})
+                      terminal/get-board-size (stub :get-board-size {:return (board/new-board)})]
           (should= :some-token (:player-token (sut/create-new-game {:console :terminal})))))
 
       (it "sets the first turn of the game to the player if they select x"
         (with-redefs [terminal/get-game-type (stub :get-game-type {:return :versus-computer})
                       terminal/get-difficulty (stub :get-difficulty {:return :some-difficulty})
-                      terminal/get-player-token (stub :get-player-token {:return :x})]
+                      terminal/get-player-token (stub :get-player-token {:return :x})
+                      terminal/get-board-size (stub :get-board-size {:return (board/new-board)})]
           (should= :player (:current-turn (sut/create-new-game {:console :terminal})))))
       (it "sets the first turn of the game to the computer if they select o"
         (with-redefs [terminal/get-game-type (stub :get-game-type {:return :versus-computer})
                       terminal/get-difficulty (stub :get-difficulty {:return :some-difficulty})
-                      terminal/get-player-token (stub :get-player-token {:return :o})]
+                      terminal/get-player-token (stub :get-player-token {:return :o})
+                      terminal/get-board-size (stub :get-board-size {:return (board/new-board)})]
           (should= :computer (:current-turn (sut/create-new-game {:console :terminal}))))))))

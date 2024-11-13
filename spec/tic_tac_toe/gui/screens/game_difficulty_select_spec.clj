@@ -1,8 +1,8 @@
-(ns tic-tac-toe.gui.screens.game-difficulty-select-screen-spec
+(ns tic-tac-toe.gui.screens.game-difficulty-select-spec
   (:require [quil.core :as q]
             [speclj.core :refer :all]
             [tic-tac-toe.gui.screen-core :as screens]
-            [tic-tac-toe.gui.screens.game-difficulty-select-screen :as sut]))
+            [tic-tac-toe.gui.screens.game-difficulty-select :as sut]))
 
 (def black [0 0 0])
 (def white [255 255 255])

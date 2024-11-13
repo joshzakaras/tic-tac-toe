@@ -1,4 +1,4 @@
-(ns tic-tac-toe.gui.screens.game-difficulty-select-screen
+(ns tic-tac-toe.gui.screens.game-difficulty-select
   (:require [quil.core :as q]
             [tic-tac-toe.gui.mouse-helper-functions :as mouse-helper]
             [tic-tac-toe.gui.screen-core :as screens]))

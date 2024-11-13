@@ -5,7 +5,7 @@
             [tic-tac-toe.core :as core]
             [tic-tac-toe.database :as db]
             [tic-tac-toe.gui.screen-core :as screens]
-            [tic-tac-toe.gui.screens.db-load-screen :as db-load-screen]
+            [tic-tac-toe.gui.screens.db-load-spec :as db-load-screen]
             [tic-tac-toe.gui.gui :as sut]))
 
 (describe "A Tic Tac Toe GUI using Quil"
@@ -27,7 +27,7 @@
 
     (it "sets the starting screen to new-game if a database is not found"
       (with-redefs [db/existing-save? (stub :existing-save? {:return false})]
-        (should= :game-type-select (:screen (core/setup {:console :gui}))))))
+        (should= :board-select (:screen (core/setup {:console :gui}))))))
 
   (context "Draw Method"
     (it "draws the currently selected screen"

@@ -3,20 +3,25 @@
 (defn insert-in-row [index row value]
   (-> (take index row)
       (concat [value])
-      (concat (take-last (- 3 (inc index)) row))))
+      (concat (take-last (- (count row) (inc index)) row))))
 
 (defn replace-row [index board new-row]
   (-> (take index board)
       (concat [new-row])
-      (concat (take-last (- 3 (inc index)) board))))
+      (concat (take-last (- (count board) (inc index)) board))))
 
 (defn set-square [coords value board]
   (let [row (nth board (:row coords))]
     (->> (insert-in-row (:column coords) row value)
          (replace-row (:row coords) board))))
 
-(defn new-board []
-  [["" "" ""] ["" "" ""] ["" "" ""]])
+(defn new-row [count]
+  (take count (repeat "")))
+
+(defn new-board
+  ([] (new-board 3 3))
+  ([row-count column-count]
+   (take row-count (repeat (new-row column-count)))))
 
 (defn full-board? [board]
   (->> (flatten board)
@@ -45,12 +50,19 @@
     :o))
 
 (defn get-columns [board]
-  (->> (range 3)
-       (map #(take-nth 3 (drop % (flatten board))))))
+  (->> (range (count board))
+       (map #(take-nth (count board) (drop % (flatten board))))))
+
+(defn get-top-to-bottom-diagonal [board]
+  (for [index (range 0 (count board))]
+    (get-square {:row index :column index} board)))
+
+(defn get-bottom-to-top-diagonal [board]
+  (for [index (range 0 (count board))]
+    (get-square {:row index :column (- (- (count board) 1) index)} board)))
 
 (defn get-diagonals [board]
-  [[(get-square {:row 0 :column 0} board) (get-square {:row 1 :column 1} board) (get-square {:row 2 :column 2} board)]
-   [(get-square {:row 2 :column 0} board) (get-square {:row 1 :column 1} board) (get-square {:row 0 :column 2} board)]])
+   [(get-top-to-bottom-diagonal board) (get-bottom-to-top-diagonal board)])
 
 (defn get-all-sets [board]
   (concat (get-columns board) (get-diagonals board) board))
@@ -71,3 +83,6 @@
 
 (defn is-there-tie? [board]
   (and (full-board? board) (not (is-there-win? board))))
+
+(defn game-over? [board]
+  (or (is-there-win? board) (is-there-tie? board)))

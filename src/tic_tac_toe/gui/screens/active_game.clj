@@ -1,6 +1,7 @@
-(ns tic-tac-toe.gui.screens.game-screen
+(ns tic-tac-toe.gui.screens.active-game
   (:require [quil.core :as q]
             [tic-tac-toe.computer-player :as cpu]
+            [tic-tac-toe.core :as core]
             [tic-tac-toe.database :as db]
             [tic-tac-toe.database :as database]
             [tic-tac-toe.game-board :as board]
@@ -50,7 +51,7 @@
 (defn do-player-turn [game potential-move]
   (-> game
       (assoc :board (board/set-square potential-move (board/get-current-turn (:board game)) (:board game)))
-      game-state/update-current-turn))
+      core/update-current-turn))
 
 (defn maybe-do-player-turn [game]
   (let [mouse (:mouse game)
@@ -62,7 +63,7 @@
 (defn do-computer-turn [game]
   (-> game
       (assoc :board (cpu/play-computer-turn (:board game) (:difficulty game)))
-      game-state/update-current-turn))
+      core/update-current-turn))
 
 (defn maybe-do-computer-turn [game]
   (if (and (= :computer (:current-turn game)) (= :playing (:state game)))

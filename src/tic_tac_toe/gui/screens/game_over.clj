@@ -1,4 +1,4 @@
-(ns tic-tac-toe.gui.screens.game-over-screen
+(ns tic-tac-toe.gui.screens.game-over
   (:require [quil.core :as q]
             [tic-tac-toe.game-board :as board]
             [tic-tac-toe.gui.screen-core :as screens]))

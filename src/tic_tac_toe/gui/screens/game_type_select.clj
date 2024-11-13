@@ -1,4 +1,4 @@
-(ns tic-tac-toe.gui.screens.game-type-select-screen
+(ns tic-tac-toe.gui.screens.game-type-select
   (:require [quil.core :as q]
             [tic-tac-toe.game-board :as board]
             [tic-tac-toe.gui.mouse-helper-functions :as mouse-helper]
@@ -37,15 +37,13 @@
 (defn do-confirmed-selection [game]
   (-> game
       (merge {:game-type :versus-computer})
-      (assoc :screen :difficulty-select)
-      (merge {:board (board/new-board)})))
+      (assoc :screen :difficulty-select)))
 
 (defn do-denied-selection [game]
   (-> game
       (merge {:game-type :versus-player})
       (assoc :screen :active-game)
       (assoc :state :playing)
-      (merge {:board (board/new-board)})
       (merge {:current-turn :player})))
 
 (defmethod screens/on-click :game-type-select [game]

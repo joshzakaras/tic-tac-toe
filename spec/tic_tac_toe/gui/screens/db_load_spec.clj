@@ -1,9 +1,9 @@
-(ns tic-tac-toe.gui.screens.db-load-screen-spec
+(ns tic-tac-toe.gui.screens.db-load-spec
   (:require [quil.core :as q]
             [speclj.core :refer :all]
             [tic-tac-toe.database :as db]
             [tic-tac-toe.gui.gui :as gui]
-            [tic-tac-toe.gui.screens.db-load-screen :as sut]
+            [tic-tac-toe.gui.screens.db-load :as sut]
             [tic-tac-toe.gui.mouse-helper-functions :as mouse-helper]
             [tic-tac-toe.gui.screen-core :as screens]))
 
@@ -79,4 +79,4 @@
 
   (it "Sets the screen to new game when the decline button is clicked on the load-db screen"
     (with-redefs [db/read-stored-game (stub :read-stored-game {:return {:some-game-keys :some-game-values}})]
-      (should= :game-type-select (:screen (screens/on-click {:screen :db-load :state :setup :mouse {:x 125 :y 45}}))))))
+      (should= :board-select (:screen (screens/on-click {:screen :db-load :state :setup :mouse {:x 125 :y 45}}))))))

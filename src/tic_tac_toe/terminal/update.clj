@@ -13,6 +13,7 @@
       (assoc game :board (board/set-square player-move current-turn (:board game)))))
 
 (defmethod play-turn :computer [game]
+  (println "Computer is thinking...")
   (assoc game :board (cpu/play-computer-turn (:board game) (:difficulty game))))
 
 (defn maybe-play-turn [game]
@@ -20,7 +21,7 @@
     game
     (-> game
         play-turn
-        game-state/update-current-turn)))
+        core/update-current-turn)))
 
 (defmethod core/update :terminal [game]
   (-> game

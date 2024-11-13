@@ -1,4 +1,4 @@
-(ns tic-tac-toe.gui.screens.db-load-screen
+(ns tic-tac-toe.gui.screens.db-load
   (:require [quil.core :as q]
             [tic-tac-toe.database :as db]
             [tic-tac-toe.gui.screen-core :as screens]
@@ -44,7 +44,7 @@
           (assoc :screen :active-game))
       (within-denial-box? (:x mouse) (:y mouse))
       (-> game
-          (assoc :screen :game-type-select))
+          (assoc :screen :board-select))
       :else game)))
 
 (defmethod screens/update :db-load [game] game)

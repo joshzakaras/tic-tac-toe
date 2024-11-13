@@ -8,7 +8,7 @@
 
 (defn create-new-game [game]
   (-> game
-      (merge {:board (board/new-board)})
+      (merge {:board (terminal/get-board-size)})
       (merge {:game-type (terminal/get-game-type)})
       load-type-specific-settings))
 

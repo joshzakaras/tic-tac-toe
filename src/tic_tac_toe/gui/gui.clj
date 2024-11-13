@@ -4,17 +4,18 @@
             [tic-tac-toe.core :as core]
             [tic-tac-toe.database :as db]
             [tic-tac-toe.gui.screen-core :as screens]
-            [tic-tac-toe.gui.screens.db-load-screen]
-            [tic-tac-toe.gui.screens.game-screen]
-            [tic-tac-toe.gui.screens.game-type-select-screen]
-            [tic-tac-toe.gui.screens.game-difficulty-select-screen]
-            [tic-tac-toe.gui.screens.token-select-screen]
-            [tic-tac-toe.gui.screens.game-over-screen]])
+            [tic-tac-toe.gui.screens.db-load]
+            [tic-tac-toe.gui.screens.active-game]
+            [tic-tac-toe.gui.screens.game-type-select]
+            [tic-tac-toe.gui.screens.game-difficulty-select]
+            [tic-tac-toe.gui.screens.token-select]
+            [tic-tac-toe.gui.screens.game-over]
+            [tic-tac-toe.gui.screens.board-select]])
 
 (defn set-starting-screen [game]
   (merge game {:screen (if (db/existing-save?)
                          :db-load
-                         :game-type-select)}))
+                         :board-select)}))
 
 (defmethod core/setup :gui [game]
   (-> game
@@ -31,7 +32,6 @@
       (merge {:mouse event})
       screens/on-click
       (dissoc :mouse)))
-
 
 (defmethod core/start-game! :gui [game]
   (q/sketch
